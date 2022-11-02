@@ -3,17 +3,13 @@
 
 {% block meta %}
     <title>Partnership | Irama Kain</title>
+    {% load static %}
+    <link rel="stylesheet" href= "{% static "/partnership/css/style.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 {% endblock meta %}
 
 {% block content %}
-<html>
-    <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href= "{% static "/partnership/css/style.css" %}">
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
+
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
               <a class="navbar-brand" href="{% url 'Home:show_home' %}">Irama Kain</a>
@@ -51,9 +47,8 @@
         <section>
          <div>
             <div class="row">
-                <h1 class="header">Keep in touch</h1>
-                <p class="subheader">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <p> </p>
+                <h1 class="header">Get in touch !!</h1>
+                <p class="subheader">Want to get in touch? We'd love to hear from you. Here's how you can reach us...</p>
             </div>
             <div class="container1">
                 <div class="contactInfo">
@@ -66,11 +61,11 @@
                             </li>
                             <li>
                                 <span><img src="../static/partnership/img/Message.png"></span>
-                                <span>lorem@ipsum.com</span>
+                                <span>iramakain@gmail.com</span>
                             </li>
                             <li>
                                 <span><img src="../static/partnership/img/Call.png"></span>
-                                <span>+6287343486023</span>
+                                <span>(021) 7863419</span>
                             </li>
                         </ul>
                     </div>
@@ -85,57 +80,45 @@
                     <h2>Send us a Message</h2>
                     <div class="formBox">
                         <div class="inputBox w50">
-                            <input type="text" required>
+                            <input type="text" type="text" id="nama_depan" name="nama_belakang">
                             <span>First Name</span>
                         </div>
                         <div class="inputBox w50">
-                            <input type="text" required>
+                            <input type="text" id="nama_belakang" name="nama_belakang">
                             <span>Last Name</span>
                         </div>
                         <div class="inputBox w50">
-                            <input type="email" required>
+                            <input type="email" id="email_user" name="email_user">
                             <span>Email Address</span>
                         </div>
                         <div class="inputBox w50">
-                            <input type="text" required>
+                            <input type="text" id="nomor_user" name="nomor_user">
                             <span>Phone Number</span>
                         </div>
                         <span>Message</span>
                         <div class="inputBox w100">
-                            <form action="formComment" aria-roledescription="{% url 'partnership:comment' %}" autocomplete="off">
+                            <form action="formComment" autocomplete="off">
                                 {% csrf_token %}
-                                <div class="row">
-                                    <div class="col 12">
-                                        <div class="form-group validate">
-                                            <textarea class="form-control" name="comment"></textarea>
-                                        </div>
-                                    </div>                   
-                                </div>
+                                    <textarea class="form-control" id="pesanUser" name="Message"></textarea>
                             </form>
                         </div>
                         <div class="inputBox w100">
-                            <input type="submit" class="btn btn-primary pl-5 pr-5 btnSave" value="Send">
+                            <button type="button" class="btn btn-primary pl-5 pr-5 btnSave" id="sendButton">Send</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="container2">
-                <div class="messageUser">
-                    <h2>Your Message</h2>
-                    <div class="comment-context mt-5" data-url="{% url 'partnership:comment_data' %}"></div>
-                </div>
-            </div>
             
          </div>
         </section>
         <footer class = "text-center text-lg-start pt-4" style = "background: #F3F3F3;
-        background: linear-gradient(0deg, #AAC38A 0%, #F3F3F3 80%); margin-top: 50px;">
+          background: linear-gradient(0deg, #AAC38A 0%, #F3F3F3 80%); margin-top: 50px;">
             <section class = "">
                 <div class = "container text-center text-md-start mt-5">
                     <div class = "row mt-3">
                         <div class="col-md-3 col-lg-4 col-xl-3 ms-5 mb-4" ALIGN = left>
-                            <img src="../static/partnership/iramakain.png" height="83px" width="150px" alt="test">
+                            <img src="../static/partnership/img/iramakain.png" height="83px" width="150px" alt="test">
                             <hr>
                             <h6>
                                 The era of fashion revolution, The era of sustainable garments.
@@ -175,60 +158,57 @@
                 </div>
             </section>
         </footer>
-    </body>
-</html>
+     
+        <script>
+            function getComments(){
+                $ajax({
+                    url: $(".comment-content").data('url'),
+                    type: "GET",
+                    success: function(resp){
+                        $(".comment-content").html(resp);
+                    },
+                    error: function(resp){
+                        console.log("something went wrong");
+                    }
+                });
+            }
+            getComments();
+            $("formComment").on("submit", function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                var $this = $(this);
+                var valid = true;
+                $('#formComment textarea').each(function(){
+                    let $this = $(this)
+        
+                    if(!$this.val()){
+                        valid = false;
+                        $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' '))
+                    }
+                });
+        
+                if(valid){
+                    $(".btnSave").text('Saving...').attr('disabled',true);
+                    let data = $this.serialize();
+                ajax({
+                    url: $this.attr('action'),
+                    type: "POST",
+                    dataType: 'json',
+                    success: function(resp){
+                        if(resp.message === 'success'){
+                            getComments();
+                        } else{
+                            alert(resp.message);
+                        }
+                    },
+                    error: function(resp){
+                        console.log('somethin went wrong');
+                    }
+                });
+                }
+                return false
+            });
+        </script>
+
 
 {% endblock content %}
-
-{% block scripts %}
-<script>
-    function getComments(){
-        $ajax({
-            url: $(".comment-content").data('url'),
-            type: "GET",
-            success: function(resp){
-                $(".comment-content").html(resp);
-            },
-            error: function(resp){
-                console.log("something went wrong");
-            }
-        });
-    }
-    getComments();
-    $("formComment").on("submit", function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        var $this = $(this);
-        var valid = true;
-        $('#formComment textarea').each(function(){
-            let $this = $(this)
-
-            if(!$this.val()){
-                valid = false;
-                $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' '))
-            }
-        });
-
-        if(valid){
-            $(".btnSave").text('Saving...').attr('disabled',true);
-            let data = $this.serialize();
-        ajax({
-            url: $this.attr('action'),
-            type: "POST",
-            dataType: 'json',
-            success: function(resp){
-                if(resp.message === 'success'){
-                    getComments();
-                } else{
-                    alert(resp.message);
-                }
-            },
-            error: function(resp){
-                console.log('somethin went wrong');
-            }
-        });
-        }
-        return false
-    });
-</script>
-{% endblock scripts %}
